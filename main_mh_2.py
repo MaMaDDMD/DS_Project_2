@@ -7,25 +7,20 @@ from whoosh.analysis import SimpleAnalyzer, StopFilter
 import os
 from collections import Counter
 from math import log
-'''
+from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
-
-X = [[1, 2], [1, 4], [1, 0], [4, 2], [4, 4], [4, 0]]
-kmeans = KMeans(n_clusters=2, random_state=0).fit(X)
-'''
-'''
 import matplotlib.pyplot as plt
 
-# Plot the clustered data
-plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow')
-plt.show()
-'''
 class Static:
     @staticmethod
     def tokenize(text):
         analyzer = SimpleAnalyzer() | StopFilter()
         tokens = [token.text for token in analyzer(text)]
         return tokens
+
+    @staticmethod
+    def reducedimensions(vectors_list):
+        return PCA(n_components=2).fit_transform(vectors_list)
     
     docs_tokenized_words = list()
 
@@ -70,13 +65,29 @@ class Program:
     def __init__(self):
         self.docs_vectors_list = list()
         index = 0
-        while(index != 6):
+        while(index != 1001):
             Static.docs_tokenized_words.append(Static.tokenize(open(os.getcwd() + "\\data\\document_" + str(index) + ".txt", "r", encoding='utf-8').read()))
             index += 1
         index = 0
-        while(index != 6):
+        while(index != 1001):
             self.docs_vectors_list.append(Document(index).doc_vector)
             index += 1
+        temp = list()
+        index = 0
+        while(index != 1001):
+            i = 5
+            while(i != 0):
+                temp.append(max(self.docs_vectors_list[index]))
+                i -= 1
+            self.docs_vectors_list[index].clear()
+            for item in temp:
+                self.docs_vectors_list[index].append(item)
+            temp.clear()
+            index += 1
+        self.docs_reduced_dims_vectors_list = Static.reducedimensions(self.docs_vectors_list)
+        self.kmeans = KMeans(n_clusters = 3, random_state = 0).fit(self.docs_reduced_dims_vectors_list)
+        plt.scatter(self.docs_reduced_dims_vectors_list[:, 0], self.docs_reduced_dims_vectors_list[:, 1], c=self.kmeans.labels_, cmap='rainbow')
+        plt.show()
 
 if __name__ == "__main__":
     system = Program()
