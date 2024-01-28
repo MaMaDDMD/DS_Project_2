@@ -8,7 +8,6 @@ from whoosh.analysis import SimpleAnalyzer, StopFilter
 
 dir_path = "C:/Users/amrmr/OneDrive/Desktop/data"
 
-
 class Document:
     def __init__(self, doc_num): 
         text = open(f"{dir_path}/document_{doc_num}.txt", "r", encoding='utf-8').read()
@@ -18,7 +17,6 @@ class Document:
         self.vector = dict()
         self.reduced_vector = dict()
 
-
     def tf_calculator(self, text):
         term_counter = Counter()
         tokenized_text = Document.tokenize_line(text)
@@ -27,15 +25,11 @@ class Document:
         for term in self.dim:
             self.tf[term] = term_counter[term] / len(tokenized_text)
 
-
     @staticmethod
     def tokenize_line(txt):
-        '''Create a SimpleAnalyzer with default stop words
-           Tokenize the query using the analyzer'''
         analyzer = SimpleAnalyzer() | StopFilter()
         tokens = [token.text for token in analyzer(txt)]
         return tokens
-
 
     def doc_vector_cal(self, idf):
         for term in idf:
@@ -117,7 +111,6 @@ class DocumentCluster:
         plt.ylabel('Principal Component 2')
         plt.show()
 
-
 if __name__ == "__main__":
-    doc_list = input("Enter the document numbers: ").split(" ")
-    cluster = DocumentCluster(doc_list)
+    Doc_list = input("Enter the document numbers: ").split(" ")
+    cluster = DocumentCluster(Doc_list)
